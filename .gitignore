@@ -26,8 +26,8 @@ src/main/resources/application.yml
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-**/SwaggerConfig.class
-**/SwaggerConfig.java
+#**/SwaggerConfig.class
+#**/SwaggerConfig.java
 
 ### NetBeans ###
 /nbproject/private/
