@@ -4,4 +4,6 @@ import com.multitab.sessionRequest.adaptor.out.feignClient.dto.SessionResponseOu
 
 public interface MentoringServiceCallOutPort {
     SessionResponseOutDto getSessionResponseOutDtoByUuid(String uuid);
+
+    void closeSessionByUuid(String uuid);
 }

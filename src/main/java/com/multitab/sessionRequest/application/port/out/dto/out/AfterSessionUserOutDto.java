@@ -16,6 +16,10 @@ public class AfterSessionUserOutDto {
     private String sessionUuid;
     private String menteeUuid;
     private Status status;
+    @Setter
+    private String mentoringName;
+    @Setter
+    private Boolean isClosed;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -10,6 +10,7 @@ public class RegisterSessionVoMapper {
         return RegisterSessionDto.builder()
                 .menteeUuid(vo.getMenteeUuid())
                 .sessionUuid(vo.getSessionUuid())
+                .mentoringName(vo.getMentoringName())
                 .build();
     }
 }

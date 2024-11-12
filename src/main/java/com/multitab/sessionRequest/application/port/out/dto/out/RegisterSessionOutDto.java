@@ -2,7 +2,7 @@ package com.multitab.sessionRequest.application.port.out.dto.out;
 
 import com.multitab.sessionRequest.adaptor.out.mysql.entity.SessionUserEntity;
 import com.multitab.sessionRequest.domain.Status;
-import com.multitab.sessionRequest.domain.model.sessionRequestDomain;
+import com.multitab.sessionRequest.domain.model.SessionRequestDomain;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +20,7 @@ public class RegisterSessionOutDto {
     private Status status;
 
     // 도메인 -> 아웃포트 dto
-    public static RegisterSessionOutDto from(sessionRequestDomain domain){
+    public static RegisterSessionOutDto from(SessionRequestDomain domain){
         return RegisterSessionOutDto.builder()
                 .sessionUuid(domain.getSessionUuid())
                 .menteeUuid(domain.getMenteeUuid())

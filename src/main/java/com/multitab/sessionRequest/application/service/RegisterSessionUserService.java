@@ -10,7 +10,7 @@ import com.multitab.sessionRequest.application.port.out.SessionUserRepositoryOut
 import com.multitab.sessionRequest.application.port.out.dto.SessionUserResponseOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.out.AfterSessionUserOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.out.RegisterSessionOutDto;
-import com.multitab.sessionRequest.domain.model.sessionRequestDomain;
+import com.multitab.sessionRequest.domain.model.SessionRequestDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -27,26 +27,36 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
     private final SessionUserInquiryUseCase SessionUserInquiryUseCase;
     private final SessionUserRepositoryOutPort sessionUserRepositoryOutPort;
     private final SendMessageUseCase sendMessageUseCase;
+
     @Override
     public void registerSessionUser(RegisterSessionDto dto) {
         String uuid = dto.getSessionUuid();
         // 세션 상태 확인
-        SessionResponseOutDto sessionResponseOutDto = mentoringServiceCallUseCase.getSessionOutDtoByUuid(uuid);
-        sessionRequestDomain domain =
-                sessionRequestDomain.createSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid());
+        SessionResponseOutDto sessionResponseOut = mentoringServiceCallUseCase.getSessionOutDtoByUuid(uuid);
+        SessionRequestDomain domain =
+                SessionRequestDomain.createSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid());
+        // 세션 상태 검사
+        domain.isValidSessionState(sessionResponseOut.getIsClosed());
         // 예약 마감일 검사
-        domain.isDeadlineValid(sessionResponseOutDto.getDeadlineDate());
+        domain.isDeadlineValid(sessionResponseOut.getDeadlineDate());
         // 참가자 리스트 조회
-        List<SessionUserResponseOutDto> sessionUserOutDtos =
+        List<SessionUserResponseOutDto> sessionUserListOut =
                 SessionUserInquiryUseCase.getSessionUserOutDtoBySessionUuid(uuid);
         // 최대 신청인원수 + 멘티중복신청 검사
-        domain.isMenteeValid(sessionUserOutDtos, dto.getMenteeUuid(), sessionResponseOutDto.getMaxHeadCount());
-        // 세션 참가 신청
+        domain.isMenteeValid(sessionUserListOut, dto.getMenteeUuid(), sessionResponseOut.getMaxHeadCount());
+        // 세션 참가 신청 start
         AfterSessionUserOutDto afterSessionUserOutDto =
                 sessionUserRepositoryOutPort.registerSessionUser(RegisterSessionOutDto.from(domain));
-        log.info("afterSessionUserOutDto : "+afterSessionUserOutDto);
+        // 세션 참가 후 최대정원 다 찼는지 확인
+        Boolean closedSession = domain.isClosedSession(sessionUserListOut.size(), sessionResponseOut.getMaxHeadCount());
+        afterSessionUserOutDto.setMentoringName(dto.getMentoringName());
+        afterSessionUserOutDto.setIsClosed(closedSession);
+        log.info("afterSessionUserOutDto: {}", afterSessionUserOutDto);
+        // 정원 다 찼으면 세션 command table update
+        if(closedSession) mentoringServiceCallUseCase.closeSession(uuid);
 
+        // "세션 참가등록" 메시지 발행
         sendMessageUseCase.sendRegisterSessionUserMessage("register-session-user", afterSessionUserOutDto);
-
     }
+
 }

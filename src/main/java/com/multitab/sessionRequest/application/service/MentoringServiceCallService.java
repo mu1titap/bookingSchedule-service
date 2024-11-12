@@ -18,4 +18,9 @@ public class MentoringServiceCallService implements MentoringServiceCallUseCase 
     public SessionResponseOutDto getSessionOutDtoByUuid(String uuid) {
         return mentoringServiceCallOutPort.getSessionResponseOutDtoByUuid(uuid);
     }
+
+    @Override
+    public void closeSession(String uuid) {
+        mentoringServiceCallOutPort.closeSessionByUuid(uuid);
+    }
 }

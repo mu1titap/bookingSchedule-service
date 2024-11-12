@@ -12,4 +12,7 @@ public class RegisterSessionVo {
     private String sessionUuid;
     @Schema(description = "멘티 uuid", nullable = false)
     private String menteeUuid;
+
+    @Schema(description = "멘토링 이름", nullable = true)
+    private String mentoringName;
 }
