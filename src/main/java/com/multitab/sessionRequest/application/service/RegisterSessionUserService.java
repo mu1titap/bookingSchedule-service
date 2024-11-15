@@ -14,6 +14,7 @@ import com.multitab.sessionRequest.domain.model.SessionRequestDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
     private final SessionUserRepositoryOutPort sessionUserRepositoryOutPort;
     private final SendMessageUseCase sendMessageUseCase;
 
+    //@Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public void registerSessionUser(RegisterSessionDto dto) {
         String uuid = dto.getSessionUuid();
@@ -40,11 +42,13 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         // 예약 마감일 검사
         domain.isDeadlineValid(sessionResponseOut.getDeadlineDate());
         // 참가자 리스트 조회
+        // todo : 여기서 참가자리스트 테이블 조회 (9명)
         List<SessionUserResponseOutDto> sessionUserListOut =
                 SessionUserInquiryUseCase.getSessionUserOutDtoBySessionUuid(uuid);
         // 최대 신청인원수 + 멘티중복신청 검사
         domain.isMenteeValid(sessionUserListOut, dto.getMenteeUuid(), sessionResponseOut.getMaxHeadCount());
         // 세션 참가 신청 start
+        // todo : 여기서 참가자리스트 테이블에 Insert (+1)
         AfterSessionUserOutDto afterSessionUserOutDto =
                 sessionUserRepositoryOutPort.registerSessionUser(RegisterSessionOutDto.from(domain));
         // 세션 참가 후 최대정원 다 찼는지 확인
@@ -53,6 +57,8 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         afterSessionUserOutDto.setIsClosed(closedSession);
         log.info("afterSessionUserOutDto: {}", afterSessionUserOutDto);
         // 정원 다 찼으면 세션 command table update
+
+        // todo : 참가 후 정원 초과하면 세션 닫음 상태로 업데이트
         if(closedSession) mentoringServiceCallUseCase.closeSession(uuid);
 
         // "세션 참가등록" 메시지 발행
