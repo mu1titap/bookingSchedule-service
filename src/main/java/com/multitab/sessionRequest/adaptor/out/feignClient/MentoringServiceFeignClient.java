@@ -13,6 +13,9 @@ public interface MentoringServiceFeignClient {
     @GetMapping("/api/v1/mentoring-service/session/{uuid}")
     SessionResponseOutDto getSession(@PathVariable(name = "uuid") String uuid);
 
-    @PutMapping("/api/v1/mentoring-service/session/{uuid}")
+    @PutMapping("/api/v1/mentoring-service/session-close/{uuid}")
     void closeSession(@PathVariable(name = "uuid") String uuid);
+
+    @PutMapping("/api/v1/mentoring-service/session-open/{uuid}")
+    void openSession(@PathVariable(name = "uuid") String uuid);
 }

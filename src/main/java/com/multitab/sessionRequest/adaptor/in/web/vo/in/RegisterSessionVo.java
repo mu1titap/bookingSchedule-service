@@ -1,4 +1,4 @@
-package com.multitab.sessionRequest.adaptor.in.web.vo;
+package com.multitab.sessionRequest.adaptor.in.web.vo.in;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -10,8 +10,9 @@ import lombok.NoArgsConstructor;
 public class RegisterSessionVo {
     @Schema(description = "세션 uuid", nullable = false)
     private String sessionUuid;
-    @Schema(description = "멘티 uuid", nullable = false)
-    private String menteeUuid;
+
+    //    @Schema(description = "유저 uuid", nullable = false)
+//    private String userUuid;
 
     @Schema(description = "멘토링 이름", nullable = true)
     private String mentoringName;

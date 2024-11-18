@@ -23,4 +23,9 @@ public class MentoringServiceCallService implements MentoringServiceCallUseCase 
     public void closeSession(String uuid) {
         mentoringServiceCallOutPort.closeSessionByUuid(uuid);
     }
+
+    @Override
+    public void openSession(String uuid) {
+        mentoringServiceCallOutPort.openSessionByUuid(uuid);
+    }
 }

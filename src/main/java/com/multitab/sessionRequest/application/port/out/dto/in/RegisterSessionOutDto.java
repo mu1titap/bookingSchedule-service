@@ -1,4 +1,4 @@
-package com.multitab.sessionRequest.application.port.out.dto.out;
+package com.multitab.sessionRequest.application.port.out.dto.in;
 
 import com.multitab.sessionRequest.adaptor.out.mysql.entity.SessionUserEntity;
 import com.multitab.sessionRequest.domain.Status;
