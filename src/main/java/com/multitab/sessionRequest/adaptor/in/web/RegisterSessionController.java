@@ -1,7 +1,7 @@
 package com.multitab.sessionRequest.adaptor.in.web;
 
 import com.multitab.sessionRequest.adaptor.in.web.mapper.RegisterSessionVoMapper;
-import com.multitab.sessionRequest.adaptor.in.web.vo.RegisterSessionVo;
+import com.multitab.sessionRequest.adaptor.in.web.vo.in.RegisterSessionVo;
 import com.multitab.sessionRequest.application.port.in.RegisterSessionUserUseCase;
 import com.multitab.sessionRequest.application.port.in.SessionRockUseCase;
 import com.multitab.sessionRequest.common.entity.BaseResponse;
@@ -9,10 +9,7 @@ import com.multitab.sessionRequest.common.entity.BaseResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Log4j2
 @RestController
@@ -31,9 +28,11 @@ public class RegisterSessionController {
             " 참고 : 인자 중에서 mentoringName 는 직접적으로 멘토링 세션 참가 등록 기능에 필요한 데이터는 아니지만 스케줄 read data 업데이트에 필요함"
             ,tags = {"멘토링 세션 참가"})
     @PostMapping("")
-    public BaseResponse<Void> createMentoringAndSession(@RequestBody RegisterSessionVo request) throws InterruptedException {
+    public BaseResponse<Void> createMentoringAndSession(@RequestHeader("userUuid") String userUuid,
+                                                        @RequestBody RegisterSessionVo request) throws InterruptedException {
+
         //registerSessionUserUseCase.registerSessionUser(RegisterSessionVoMapper.from(request));
-        sessionRockUseCase.registerSessionUser(RegisterSessionVoMapper.from(request));
+        sessionRockUseCase.registerSessionUser(RegisterSessionVoMapper.of(userUuid,request));
         return new BaseResponse<>(BaseResponseStatus.SUCCESS);
     }
 }

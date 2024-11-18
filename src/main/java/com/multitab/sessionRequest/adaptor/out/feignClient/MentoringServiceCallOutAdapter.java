@@ -23,7 +23,16 @@ public class MentoringServiceCallOutAdapter implements MentoringServiceCallOutPo
         try {
             mentoringServiceClient.closeSession(uuid);
         } catch (FeignException e) {
-            log.error("FeignException error", e);
+            log.error("FeignException error => closeSession", e);
+        }
+    }
+
+    @Override
+    public void openSessionByUuid(String uuid) {
+        try {
+            mentoringServiceClient.openSession(uuid);
+        } catch (FeignException e) {
+            log.error("FeignException error => openSession", e);
         }
     }
 

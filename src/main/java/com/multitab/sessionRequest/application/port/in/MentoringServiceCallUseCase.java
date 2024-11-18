@@ -6,4 +6,6 @@ public interface MentoringServiceCallUseCase {
     SessionResponseOutDto getSessionOutDtoByUuid(String uuid);
 
     void closeSession(String uuid);
+
+    void openSession(String uuid);
 }

@@ -6,4 +6,6 @@ public interface MentoringServiceCallOutPort {
     SessionResponseOutDto getSessionResponseOutDtoByUuid(String uuid);
 
     void closeSessionByUuid(String uuid);
+
+    void openSessionByUuid(String uuid);
 }
