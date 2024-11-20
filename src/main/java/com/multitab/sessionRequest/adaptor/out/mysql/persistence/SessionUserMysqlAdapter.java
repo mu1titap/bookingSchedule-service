@@ -1,8 +1,9 @@
 package com.multitab.sessionRequest.adaptor.out.mysql.persistence;
 
+import com.multitab.sessionRequest.adaptor.out.mysql.repository.SessionUserDslRepository;
 import com.multitab.sessionRequest.adaptor.out.mysql.repository.SessionUserJpaRepository;
 import com.multitab.sessionRequest.application.port.out.SessionUserRepositoryOutPort;
-import com.multitab.sessionRequest.application.port.out.dto.SessionUserResponseOutDto;
+import com.multitab.sessionRequest.application.port.out.dto.out.SessionUserResponseOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.CancelSessionOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.ReRegisterSessionOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.out.AfterSessionUserOutDto;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -19,6 +21,7 @@ import java.util.List;
 @Component("SessionUserMysqlAdapter")
 public class SessionUserMysqlAdapter implements SessionUserRepositoryOutPort {
     private final SessionUserJpaRepository sessionUserJpaRepository;
+    private final SessionUserDslRepository sessionUserDslRepository;
     @Override
     public List<SessionUserResponseOutDto> getSessionsUserBySessionUuid(String sessionUuid, Status status) {
         return SessionUserResponseOutDto
@@ -52,4 +55,17 @@ public class SessionUserMysqlAdapter implements SessionUserRepositoryOutPort {
                 .map(SessionUserResponseOutDto::from)
                 .orElse(null);
     }
+
+
+    @Override
+    public List<SessionUserResponseOutDto> getPendingSessionUser(String sessionUuid) {
+        return sessionUserDslRepository.getPendingSessionUser(sessionUuid);
+    }
+
+    @Override
+    public void updateSessionUserStatus(List<String> sessionUserIdList, boolean sessionIsConfirmed) {
+        sessionUserDslRepository.updateSessionUserStatus(sessionUserIdList, sessionIsConfirmed);
+    }
+
+
 }

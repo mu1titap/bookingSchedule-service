@@ -7,7 +7,7 @@ import com.multitab.sessionRequest.application.port.in.SendMessageUseCase;
 import com.multitab.sessionRequest.application.port.in.SessionUserInquiryUseCase;
 import com.multitab.sessionRequest.application.port.in.dto.RegisterSessionDto;
 import com.multitab.sessionRequest.application.port.out.SessionUserRepositoryOutPort;
-import com.multitab.sessionRequest.application.port.out.dto.SessionUserResponseOutDto;
+import com.multitab.sessionRequest.application.port.out.dto.out.SessionUserResponseOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.ReRegisterSessionOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.out.AfterSessionUserOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.RegisterSessionOutDto;

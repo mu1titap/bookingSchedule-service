@@ -5,6 +5,7 @@ import com.multitab.sessionRequest.application.port.out.SendMessageOutPort;
 import com.multitab.sessionRequest.application.port.out.dto.out.AfterSessionUserOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.out.CancelSessionUserMessage;
 import com.multitab.sessionRequest.application.port.out.dto.out.ReRegisterSessionUserMessage;
+import com.multitab.sessionRequest.application.port.out.dto.out.SessionConfirmedMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -28,5 +29,10 @@ public class SendMessageService implements SendMessageUseCase {
     @Override
     public void sendReRegisterSessionUserMessage(String topic, ReRegisterSessionUserMessage reRegisterSessionUserMessage) {
         sendMessageOutPort.sendReRegisterSessionUserMessage(topic, reRegisterSessionUserMessage);
+    }
+
+    @Override
+    public void sendConfirmSessionMessage(String topic, SessionConfirmedMessage sessionConfirmedMessage) {
+        sendMessageOutPort.sendConfirmSessionMessage(topic, sessionConfirmedMessage);
     }
 }

@@ -2,7 +2,7 @@ package com.multitab.sessionRequest.application.service;
 
 import com.multitab.sessionRequest.application.port.in.SessionUserInquiryUseCase;
 import com.multitab.sessionRequest.application.port.out.SessionUserRepositoryOutPort;
-import com.multitab.sessionRequest.application.port.out.dto.SessionUserResponseOutDto;
+import com.multitab.sessionRequest.application.port.out.dto.out.SessionUserResponseOutDto;
 import com.multitab.sessionRequest.domain.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -32,6 +32,7 @@ public class SessionUserInquiryService implements SessionUserInquiryUseCase {
     public SessionUserResponseOutDto getSessionUserOutDtoBySessionUuidAndMenteeUuid(String sessionUuid, String menteeUuid) {
         return sessionUserRepositoryOutPort.getSessionUserBySessionUuidAndMenteeUuid(sessionUuid, menteeUuid);
     }
+
 
 
 }

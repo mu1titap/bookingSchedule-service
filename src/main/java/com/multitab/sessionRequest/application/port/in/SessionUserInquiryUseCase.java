@@ -1,6 +1,6 @@
 package com.multitab.sessionRequest.application.port.in;
 
-import com.multitab.sessionRequest.application.port.out.dto.SessionUserResponseOutDto;
+import com.multitab.sessionRequest.application.port.out.dto.out.SessionUserResponseOutDto;
 import com.multitab.sessionRequest.domain.Status;
 
 import java.util.List;

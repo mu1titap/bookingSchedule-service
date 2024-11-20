@@ -9,9 +9,8 @@ import com.multitab.sessionRequest.application.port.in.SendMessageUseCase;
 import com.multitab.sessionRequest.application.port.in.SessionUserInquiryUseCase;
 import com.multitab.sessionRequest.application.port.in.dto.CancelSessionDto;
 import com.multitab.sessionRequest.application.port.out.SessionUserRepositoryOutPort;
-import com.multitab.sessionRequest.application.port.out.dto.SessionUserResponseOutDto;
+import com.multitab.sessionRequest.application.port.out.dto.out.SessionUserResponseOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.out.CancelSessionUserMessage;
-import com.multitab.sessionRequest.domain.Status;
 import com.multitab.sessionRequest.domain.model.SessionRequestDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -48,7 +47,6 @@ public class CancelSessionUserService implements CancelSessionUserUseCase {
             // "세션 참가 취소 이벤트 메시지 전송"
             sendMessageUseCase.sendCancelRegisterSessionUserMessage("cancel-session-user",
                     getCancelSessionUserMessageDto(cancelSessionDto, sessionResponse, shouldOpenSession));
-            log.info("cancelSessionUser : 세션 참가 취소 완료");
         }
     }
 

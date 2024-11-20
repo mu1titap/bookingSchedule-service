@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,29 +14,33 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     private static final String BEARER_TOKEN_PREFIX = "Bearer";
-
+    @Value("${swagger.uri}")
+    private String swaggerUri;
     @Bean
     public OpenAPI openAPI() {
+
         String securityJwtName = "JWT";
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList(
-                securityJwtName);
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(securityJwtName);
         Components components = new Components()
                 .addSecuritySchemes(securityJwtName, new SecurityScheme()
                         .name(securityJwtName)
                         .type(SecurityScheme.Type.HTTP)
                         .scheme(BEARER_TOKEN_PREFIX)
                         .bearerFormat(securityJwtName));
+
         return new OpenAPI()
                 .addSecurityItem(securityRequirement)
                 .components(components)
-                .addServersItem(new Server().url("/session-request-service"))
+                .addServersItem(new Server().url(swaggerUri))
+                //.addServersItem(new Server().url("/mentoring-service"))
                 .info(apiInfo());
     }
 
     private Info apiInfo() {
         return new Info()
-                .title("SESSION REQUEST SERVICE")
-                .description("SESSION REQUEST SERVICE Swagger UI")
+                .title("MSA - SESSION REQUEST SERVICE 문서")
+                .description("00 API 테스트를 위한 Swagger UI")
                 .version("1.0.0");
     }
+
 }
