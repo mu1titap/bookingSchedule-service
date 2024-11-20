@@ -27,8 +27,8 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 src/test
-#**/SwaggerConfig.class
-#**/SwaggerConfig.java
+**/SwaggerConfig.class
+**/SwaggerConfig.java
 
 # QueryDSL Q-files
 **/build/generated/**/Q*.java
