@@ -2,6 +2,7 @@ package com.multitab.sessionRequest.adaptor.out.mysql.persistence;
 
 import com.multitab.sessionRequest.adaptor.out.mysql.repository.SessionUserDslRepository;
 import com.multitab.sessionRequest.adaptor.out.mysql.repository.SessionUserJpaRepository;
+import com.multitab.sessionRequest.application.port.out.CheckSessionUserValidityStatusOutPort;
 import com.multitab.sessionRequest.application.port.out.SessionUserRepositoryOutPort;
 import com.multitab.sessionRequest.application.port.out.dto.out.SessionUserResponseOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.CancelSessionOutDto;
@@ -19,9 +20,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Log4j2
 @Component("SessionUserMysqlAdapter")
-public class SessionUserMysqlAdapter implements SessionUserRepositoryOutPort {
+public class SessionUserMysqlAdapter implements SessionUserRepositoryOutPort , CheckSessionUserValidityStatusOutPort {
     private final SessionUserJpaRepository sessionUserJpaRepository;
     private final SessionUserDslRepository sessionUserDslRepository;
+
+    /**
+     * SessionUserRepositoryOutPort
+     */
     @Override
     public List<SessionUserResponseOutDto> getSessionsUserBySessionUuid(String sessionUuid, Status status) {
         return SessionUserResponseOutDto
@@ -68,4 +73,11 @@ public class SessionUserMysqlAdapter implements SessionUserRepositoryOutPort {
     }
 
 
+    /**
+     * CheckSessionUserValidityStatusOutPort
+     */
+    @Override
+    public boolean checkSessionUserValidityStatus(String sessionUuid, String userUuid) {
+        return sessionUserDslRepository.checkSessionUserValidityStatus(sessionUuid, userUuid);
+    }
 }

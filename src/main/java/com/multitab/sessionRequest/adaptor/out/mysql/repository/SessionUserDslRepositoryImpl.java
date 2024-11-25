@@ -38,4 +38,19 @@ public class SessionUserDslRepositoryImpl implements SessionUserDslRepository{
                 .where(sessionUserEntity.id.in(sessionUserIdListLong))
                 .execute();
     }
+
+    @Override
+    public boolean checkSessionUserValidityStatus(String sessionUuid, String userUuid) {
+         Integer fetchOne = queryFactory
+                            .selectOne()
+                            .from(sessionUserEntity)
+                            .where(
+                                    sessionUserEntity.sessionUuid.eq(sessionUuid)
+                                            .and(sessionUserEntity.menteeUuid.eq(userUuid))
+                                            .and(sessionUserEntity.status.eq(Status.CONFIRMED))
+                            )
+                            .fetchFirst();
+
+        return fetchOne != null;
+    }
 }
