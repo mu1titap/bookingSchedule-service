@@ -48,7 +48,6 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         // 세션 참가신청 상태 확인 (이미 참가상태면 에러,취소 상태면 다시 대기상태로 업데이트)
         SessionUserResponseOutDto sessionUserResponse =
                 sessionUserInquiryUseCase.getSessionUserOutDtoBySessionUuidAndMenteeUuid(uuid, dto.getMenteeUuid());
-
         // 최초 세션 참가 신청 (insert)
         if( sessionUserResponse == null ) {
             SessionRequestDomain domain =
