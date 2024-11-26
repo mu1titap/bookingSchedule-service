@@ -26,6 +26,4 @@ public interface SessionUserJpaRepository extends JpaRepository<SessionUserEntit
     @Transactional
     int updateSessionUser(@Param("status") Status status, @Param("sessionUserId") String sessionUserId);
 
-
-
 }

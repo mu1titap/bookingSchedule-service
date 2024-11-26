@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/session-request-service")
 public class RegisterSessionController {
-    private final RegisterSessionUserUseCase registerSessionUserUseCase;
     private final SessionRockUseCase sessionRockUseCase;
 
     @Operation(summary = "세션 참가 등록" , description = "- 멘토링 세션 참가 요청 <br>" +
@@ -31,7 +30,6 @@ public class RegisterSessionController {
     public BaseResponse<Void> createMentoringAndSession(@RequestHeader("userUuid") String userUuid,
                                                         @RequestBody RegisterSessionVo request) throws InterruptedException {
 
-        //registerSessionUserUseCase.registerSessionUser(RegisterSessionVoMapper.from(request));
         sessionRockUseCase.registerSessionUser(RegisterSessionVoMapper.of(userUuid,request));
         return new BaseResponse<>(BaseResponseStatus.SUCCESS);
     }

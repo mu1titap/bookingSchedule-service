@@ -9,4 +9,6 @@ public interface SessionUserDslRepository {
     List<SessionUserResponseOutDto> getPendingSessionUser(String sessionUuid);
 
     void updateSessionUserStatus(List<String> sessionUserIdList, boolean sessionIsConfirmed);
+
+    boolean checkSessionUserValidityStatus(String sessionUuid, String userUuid);
 }

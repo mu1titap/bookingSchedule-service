@@ -41,14 +41,15 @@ public class DeadlinePastSessionUpdateService implements DeadlinePastSessionUpda
         // 참가자 리스트 상태 업데이트 (sessionIsConfirmed = true 면 [확정] false 면 [취소] )
         sessionUserRepositoryOutPort.updateSessionUserStatus(sessionUserIdList, sessionIsConfirmed);
         // 세션 확정 여부 메시지 전송
-        sendMessageOutPort.sendConfirmSessionMessage("update-session-confirmed",
-                getSessionConfirmedMessage(dto.getSessionUuid(), sessionIsConfirmed));
+        SessionConfirmedMessage sessionConfirmedMessage =
+                getSessionConfirmedMessage(dto.getMentoringId().toString(), dto.getMentorUuid(), dto.getSessionUuid(), sessionIsConfirmed, dto.getStartDate());
+        sendMessageOutPort.sendConfirmSessionMessage("update-session-confirmed",sessionConfirmedMessage);
 
         List<SessionUserUpdateMessage> sessionUserUpdateMessageList =
                 pendingSessionUserList.stream()
                 .map(sessionUser ->
-                        getSessionUserUpdateMessage(sessionUser.getMenteeUuid(), dto.getStartDate(),
-                                sessionUser.getSessionUuid(), sessionIsConfirmed ? Status.CONFIRMED : Status.CANCELLED_BY_SYSTEM))
+                    getSessionUserUpdateMessage(sessionUser.getMenteeUuid(), dto.getStartDate(),
+                            sessionUser.getSessionUuid(), sessionIsConfirmed ? Status.CONFIRMED : Status.CANCELLED_BY_SYSTEM))
                 .toList();
         // 유저마다 세션 참여 상태 업데이트 메시지 전송
         sessionUserUpdateMessageList.forEach(
@@ -57,8 +58,16 @@ public class DeadlinePastSessionUpdateService implements DeadlinePastSessionUpda
         );
     }
 
-    public SessionConfirmedMessage getSessionConfirmedMessage(String sessionUuid, boolean sessionIsConfirmed) {
-        return SessionConfirmedMessage.builder().sessionUuid(sessionUuid).sessionIsConfirmed(sessionIsConfirmed).build();
+    public SessionConfirmedMessage getSessionConfirmedMessage(String mentoringId, String mentorUuid, String sessionUuid,
+                                                              boolean sessionIsConfirmed, LocalDate startDate) {
+        return SessionConfirmedMessage.builder()
+                .mentoringId(mentoringId)
+                .mentorUuid(mentorUuid)
+                .sessionUuid(sessionUuid)
+                .sessionIsConfirmed(sessionIsConfirmed)
+                .startDate(startDate)
+                .build();
+
     }
     public SessionUserUpdateMessage getSessionUserUpdateMessage(String userUuid, LocalDate startDate,
                                                                 String sessionUuid, Status status) {
