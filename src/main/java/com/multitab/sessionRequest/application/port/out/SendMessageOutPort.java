@@ -12,4 +12,6 @@ public interface SendMessageOutPort {
     void sendConfirmSessionMessage(String topic, SessionConfirmedMessage sessionConfirmedMessage);
 
     void sendUpdateSessionUserMessage(String topic, SessionUserUpdateMessage sessionUserUpdateMessage);
+
+    void sendEndSessionMessage(String topic, EndSessionMessage endSessionMessage);
 }

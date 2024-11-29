@@ -15,7 +15,14 @@ public class MentoringServiceCallOutAdapter implements MentoringServiceCallOutPo
     private final MentoringServiceFeignClient mentoringServiceClient;
     @Override
     public SessionResponseOutDto getSessionResponseOutDtoByUuid(String uuid) {
-        return mentoringServiceClient.getSession(uuid);
+        try {
+            return mentoringServiceClient.getSession(uuid);
+        } catch (FeignException e) {
+            log.error("FeignException getSessionResponseOutDtoByUuid error => closeSession", e);
+            return null;
+        }
+
+
     }
 
     @Override

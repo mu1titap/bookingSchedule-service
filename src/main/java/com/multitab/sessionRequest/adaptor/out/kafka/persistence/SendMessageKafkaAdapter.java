@@ -16,7 +16,7 @@ public class SendMessageKafkaAdapter implements SendMessageOutPort {
     private final KafkaTemplate<String, ReRegisterSessionUserMessage> kafkaReRegisterSessionUserTemplate;
     private final KafkaTemplate<String, SessionConfirmedMessage>  kafkaSessionConfirmedTemplate;
     private final KafkaTemplate<String, SessionUserUpdateMessage>  kafkaSessionUserUpdateTemplate;
-
+    private final KafkaTemplate<String, EndSessionMessage> kafkaEndSessionTemplate;
 
     @Override
     public void sendRegisterSessionUserMessage(String topic, AfterSessionUserOutDto dto) {
@@ -69,6 +69,17 @@ public class SendMessageKafkaAdapter implements SendMessageOutPort {
         }
         catch (Exception e) {
             log.info("session user update message send 실패 : " + e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendEndSessionMessage(String topic, EndSessionMessage endSessionMessage) {
+        try {
+            kafkaEndSessionTemplate.send(topic, endSessionMessage);
+        }
+        catch (Exception e) {
+            log.info("end session message send 실패 : " + e);
             throw new RuntimeException(e);
         }
     }

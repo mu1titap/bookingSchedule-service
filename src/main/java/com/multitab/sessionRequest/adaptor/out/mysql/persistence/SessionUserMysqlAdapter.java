@@ -3,7 +3,9 @@ package com.multitab.sessionRequest.adaptor.out.mysql.persistence;
 import com.multitab.sessionRequest.adaptor.out.mysql.repository.SessionUserDslRepository;
 import com.multitab.sessionRequest.adaptor.out.mysql.repository.SessionUserJpaRepository;
 import com.multitab.sessionRequest.application.port.out.CheckSessionUserValidityStatusOutPort;
+import com.multitab.sessionRequest.application.port.out.SessionUserInqueryRepositoryOutPort;
 import com.multitab.sessionRequest.application.port.out.SessionUserRepositoryOutPort;
+import com.multitab.sessionRequest.application.port.out.SessionUserStatusManagementOutPort;
 import com.multitab.sessionRequest.application.port.out.dto.out.SessionUserResponseOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.CancelSessionOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.ReRegisterSessionOutDto;
@@ -14,13 +16,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Log4j2
 @Component("SessionUserMysqlAdapter")
-public class SessionUserMysqlAdapter implements SessionUserRepositoryOutPort , CheckSessionUserValidityStatusOutPort {
+public class SessionUserMysqlAdapter implements SessionUserRepositoryOutPort , CheckSessionUserValidityStatusOutPort,
+        SessionUserInqueryRepositoryOutPort, SessionUserStatusManagementOutPort {
     private final SessionUserJpaRepository sessionUserJpaRepository;
     private final SessionUserDslRepository sessionUserDslRepository;
 
@@ -68,8 +70,13 @@ public class SessionUserMysqlAdapter implements SessionUserRepositoryOutPort , C
     }
 
     @Override
-    public void updateSessionUserStatus(List<String> sessionUserIdList, boolean sessionIsConfirmed) {
-        sessionUserDslRepository.updateSessionUserStatus(sessionUserIdList, sessionIsConfirmed);
+    public List<SessionUserResponseOutDto> getConfirmedSessionUser(String sessionUuid) {
+        return sessionUserDslRepository.getConfirmedSessionUser(sessionUuid);
+    }
+
+    @Override
+    public void deadlineUpdateSessionUserStatus(List<String> sessionUserIdList, boolean sessionIsConfirmed) {
+        sessionUserDslRepository.deadlineUpdateSessionUserStatus(sessionUserIdList, sessionIsConfirmed);
     }
 
 
@@ -79,5 +86,10 @@ public class SessionUserMysqlAdapter implements SessionUserRepositoryOutPort , C
     @Override
     public boolean checkSessionUserValidityStatus(String sessionUuid, String userUuid) {
         return sessionUserDslRepository.checkSessionUserValidityStatus(sessionUuid, userUuid);
+    }
+
+    @Override
+    public void endSessionUserState(List<String> sessionUserIdList) {
+        sessionUserDslRepository.updateStatusEndSessionUser(sessionUserIdList);
     }
 }

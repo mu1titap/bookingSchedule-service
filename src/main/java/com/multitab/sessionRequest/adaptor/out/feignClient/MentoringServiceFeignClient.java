@@ -18,4 +18,4 @@ public interface MentoringServiceFeignClient {
 
     @PutMapping("/api/v1/mentoring-service/session-open/{uuid}")
     void openSession(@PathVariable(name = "uuid") String uuid);
-}
+}       

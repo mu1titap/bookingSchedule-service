@@ -15,4 +15,5 @@ public interface SessionUserInquiryUseCase {
     SessionUserResponseOutDto getSessionUserOutDtoBySessionUuidAndMenteeUuid(String sessionUuid,
                                                                              String menteeUuid);
 
+
 }
