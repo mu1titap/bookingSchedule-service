@@ -31,7 +31,19 @@ public class SessionUserDslRepositoryImpl implements SessionUserDslRepository{
     }
 
     @Override
-    public void updateSessionUserStatus(List<String> sessionUserIdList, boolean sessionIsConfirmed) {
+    public List<SessionUserResponseOutDto> getConfirmedSessionUser(String sessionUuid) {
+        return queryFactory.select(
+                        new QSessionUserResponseOutDto(sessionUserEntity.id.stringValue(), sessionUserEntity.sessionUuid,
+                                sessionUserEntity.menteeUuid, sessionUserEntity.status)
+                )
+                .from(sessionUserEntity)
+                .where(sessionUserEntity.sessionUuid.eq(sessionUuid)
+                        .and(sessionUserEntity.status.eq(Status.CONFIRMED)))
+                .fetch();
+    }
+
+    @Override
+    public void deadlineUpdateSessionUserStatus(List<String> sessionUserIdList, boolean sessionIsConfirmed) {
         List<Long> sessionUserIdListLong = sessionUserIdList.stream().map(Long::valueOf).toList();
         queryFactory.update(sessionUserEntity)
                 .set(sessionUserEntity.status, sessionIsConfirmed ? Status.CONFIRMED : Status.CANCELLED_BY_SYSTEM)
@@ -52,5 +64,14 @@ public class SessionUserDslRepositoryImpl implements SessionUserDslRepository{
                             .fetchFirst();
 
         return fetchOne != null;
+    }
+
+    @Override
+    public void updateStatusEndSessionUser(List<String> sessionUserIdList ) {
+        List<Long> sessionUserIdListLong = sessionUserIdList.stream().map(Long::valueOf).toList();
+        queryFactory.update(sessionUserEntity)
+                .set(sessionUserEntity.status, Status.END )
+                .where(sessionUserEntity.id.in(sessionUserIdListLong))
+                .execute();
     }
 }
