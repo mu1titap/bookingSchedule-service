@@ -6,6 +6,7 @@ import com.multitab.sessionRequest.application.port.in.RegisterSessionUserUseCas
 import com.multitab.sessionRequest.application.port.in.SendMessageUseCase;
 import com.multitab.sessionRequest.application.port.in.SessionUserInquiryUseCase;
 import com.multitab.sessionRequest.application.port.in.dto.RegisterSessionDto;
+import com.multitab.sessionRequest.application.port.out.SendMessageOutPort;
 import com.multitab.sessionRequest.application.port.out.SessionUserRepositoryOutPort;
 import com.multitab.sessionRequest.application.port.out.dto.out.SessionUserResponseOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.ReRegisterSessionOutDto;
@@ -29,7 +30,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
     private final MentoringServiceCallUseCase mentoringServiceCallUseCase;
     private final SessionUserInquiryUseCase sessionUserInquiryUseCase;
     private final SessionUserRepositoryOutPort sessionUserRepositoryOutPort;
-    private final SendMessageUseCase sendMessageUseCase;
+    private final SendMessageOutPort sendMessageOutPort;
 
     //@Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
@@ -56,12 +57,14 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
                     sessionUserRepositoryOutPort.registerSessionUser(RegisterSessionOutDto.from(domain));
             // 세션 참가 후 최대정원 다 찼는지 확인
             Boolean closedSession = domain.isClosedSession(sessionUserListOut.size(), sessionResponseOut.getMaxHeadCount());
-            afterSessionUserOutDto.setMentoringName(dto.getMentoringName());
-            afterSessionUserOutDto.setIsClosed(closedSession);
+
             // 정원 다 찼으면 세션 command table update
             if(closedSession) mentoringServiceCallUseCase.closeSession(uuid);
             // "세션 참가등록" 메시지 발행
-            sendMessageUseCase.sendRegisterSessionUserMessage("register-session-user", afterSessionUserOutDto);
+            afterSessionUserOutDto.setMentoringName(dto.getMentoringName());
+            afterSessionUserOutDto.setIsClosed(closedSession);
+            afterSessionUserOutDto.setMenteeImageUrl(dto.getUserImageUrl());
+            sendMessageOutPort.sendRegisterSessionUserMessage("register-session-user", afterSessionUserOutDto);
         }
         // 취소 -> 대기상태로 업데이트 (취소했다가 다시 신청한 경우임)
         else if( sessionUserResponse.getStatus() == Status.CANCELLED_BY_USER ) {
@@ -77,7 +80,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
                     shouldCloseSession = true;
                 }
                 // "세션 참가 재등록" 메시지 발행
-                sendMessageUseCase.sendReRegisterSessionUserMessage("re-register-session-user",
+                sendMessageOutPort.sendReRegisterSessionUserMessage("re-register-session-user",
                         getReRegisterSessionUserMessage(dto, sessionResponseOut, shouldCloseSession));
             }
         }
