@@ -11,6 +11,7 @@ public class RegisterSessionVoMapper {
     public static RegisterSessionDto of (String userUuid,RegisterSessionVo vo) {
         return RegisterSessionDto.builder()
                 .menteeUuid(userUuid)
+                .userImageUrl(vo.getUserImageUrl())
                 .sessionUuid(vo.getSessionUuid())
                 .mentoringName(vo.getMentoringName())
                 .build();

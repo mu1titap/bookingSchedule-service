@@ -13,6 +13,7 @@ public class RegisterSessionDto {
     private String sessionUuid;
 
     private String menteeUuid;
+    private String userImageUrl;
 
     private String mentoringName;
 

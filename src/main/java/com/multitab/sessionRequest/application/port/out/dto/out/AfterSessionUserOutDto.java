@@ -15,6 +15,8 @@ public class AfterSessionUserOutDto {
     private String id; // 세션유저 Id
     private String sessionUuid;
     private String menteeUuid;
+    @Setter
+    private String menteeImageUrl;
     private Status status;
     @Setter
     private String mentoringName;
