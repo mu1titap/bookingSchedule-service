@@ -45,7 +45,9 @@ public class DeadlinePastSessionUpdateService implements DeadlinePastSessionUpda
         sessionUserStatusManagementOutPort.deadlineUpdateSessionUserStatus(sessionUserIdList, sessionIsConfirmed);
         // 세션 확정 여부 메시지 전송
         SessionConfirmedMessage sessionConfirmedMessage =
-                getSessionConfirmedMessage(dto.getMentoringId().toString(), dto.getMentorUuid(), dto.getSessionUuid(), sessionIsConfirmed, dto.getStartDate());
+                getSessionConfirmedMessage(dto.getMentoringId().toString(), dto.getMentorUuid(), dto.getSessionUuid(), sessionIsConfirmed, dto.getStartDate(),
+                        dto.getMinHeadCount(), dto.getMaxHeadCount(), pendingSessionUserList.size());
+
         sendMessageOutPort.sendConfirmSessionMessage("update-session-confirmed",sessionConfirmedMessage);
 
         List<SessionUserUpdateMessage> sessionUserUpdateMessageList =
@@ -62,13 +64,17 @@ public class DeadlinePastSessionUpdateService implements DeadlinePastSessionUpda
     }
 
     public SessionConfirmedMessage getSessionConfirmedMessage(String mentoringId, String mentorUuid, String sessionUuid,
-                                                              boolean sessionIsConfirmed, LocalDate startDate) {
+                                                              boolean sessionIsConfirmed, LocalDate startDate, Integer minHeadCount,
+                                                              Integer maxHeadCount, Integer nowHeadCount) {
         return SessionConfirmedMessage.builder()
                 .mentoringId(mentoringId)
                 .mentorUuid(mentorUuid)
                 .sessionUuid(sessionUuid)
                 .sessionIsConfirmed(sessionIsConfirmed)
                 .startDate(startDate)
+                .maxHeadCount(maxHeadCount)
+                .minHeadCount(minHeadCount)
+                .nowHeadCount(nowHeadCount)
                 .build();
 
     }

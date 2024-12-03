@@ -38,6 +38,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         String uuid = dto.getSessionUuid();
         // 세션 상태 확인
         SessionResponseOutDto sessionResponseOut = mentoringServiceCallUseCase.getSessionOutDtoByUuid(uuid);
+        log.info("sessionResponseOut : {}", sessionResponseOut);
         // 세션 상태 검사 , 예약 마감일 검사
         SessionRequestDomain.isValidSessionState(sessionResponseOut.getIsClosed());
         SessionRequestDomain.isDeadlineValid(sessionResponseOut.getDeadlineDate());
@@ -90,6 +91,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         return ReRegisterSessionUserMessage.builder()
                 .sessionUuid(dto.getSessionUuid())
                 .menteeUuid(dto.getMenteeUuid())
+                .menteeImageUrl(dto.getUserImageUrl())
                 .startDate(sessionResponseOut.getStartDate())
                 .shouldCloseSession(shouldCloseSession)
                 .build();
