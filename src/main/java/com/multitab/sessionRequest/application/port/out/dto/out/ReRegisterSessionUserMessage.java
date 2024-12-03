@@ -12,6 +12,7 @@ public class ReRegisterSessionUserMessage {
     private String sessionUuid;
 
     private String menteeUuid;
+    private String menteeImageUrl;
 
     private LocalDate startDate;
 
