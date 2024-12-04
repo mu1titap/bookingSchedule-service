@@ -1,11 +1,16 @@
 package com.multitab.sessionRequest.application.service;
 
+import com.multitab.sessionRequest.adaptor.out.feignClient.PaymentServiceFeignClient;
 import com.multitab.sessionRequest.adaptor.out.feignClient.dto.SessionResponseOutDto;
+import com.multitab.sessionRequest.adaptor.out.feignClient.vo.SessionPaymentVo;
+import com.multitab.sessionRequest.adaptor.out.mongo.dto.MentoringSessionResponseDto;
+import com.multitab.sessionRequest.adaptor.out.mongo.persistence.MentoringSessionMongoAdapter;
 import com.multitab.sessionRequest.application.port.in.MentoringServiceCallUseCase;
 import com.multitab.sessionRequest.application.port.in.RegisterSessionUserUseCase;
 import com.multitab.sessionRequest.application.port.in.SendMessageUseCase;
 import com.multitab.sessionRequest.application.port.in.SessionUserInquiryUseCase;
 import com.multitab.sessionRequest.application.port.in.dto.RegisterSessionDto;
+import com.multitab.sessionRequest.application.port.out.MentoringServiceCallOutPort;
 import com.multitab.sessionRequest.application.port.out.SendMessageOutPort;
 import com.multitab.sessionRequest.application.port.out.SessionUserRepositoryOutPort;
 import com.multitab.sessionRequest.application.port.out.dto.out.SessionUserResponseOutDto;
@@ -31,6 +36,8 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
     private final SessionUserInquiryUseCase sessionUserInquiryUseCase;
     private final SessionUserRepositoryOutPort sessionUserRepositoryOutPort;
     private final SendMessageOutPort sendMessageOutPort;
+    private final PaymentServiceFeignClient paymentServiceFeignClient;
+    private final MentoringSessionMongoAdapter mentoringSessionMongoAdapter;
 
     //@Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
@@ -51,6 +58,17 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
                 sessionUserInquiryUseCase.getSessionUserOutDtoBySessionUuidAndMenteeUuid(uuid, dto.getMenteeUuid());
         // 최초 세션 참가 신청 (insert)
         if( sessionUserResponse == null ) {
+            // dto 생성
+            MentoringSessionResponseDto mentoringSessionResponseDto =
+            mentoringSessionMongoAdapter.getMentorUuidBySessionUuid(dto.getSessionUuid());
+            // 결제 요청
+            paymentServiceFeignClient.paymentSession(SessionPaymentVo.builder()
+                .sessionUuid(dto.getSessionUuid())
+                .menteeUuid(dto.getMenteeUuid())
+                .mentorUuid(mentoringSessionResponseDto.getMentorUuid())
+                .volt(Integer.parseInt(mentoringSessionResponseDto.getPrice()))
+                .build());
+
             SessionRequestDomain domain =
                     SessionRequestDomain.createSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid());
             AfterSessionUserOutDto afterSessionUserOutDto =
