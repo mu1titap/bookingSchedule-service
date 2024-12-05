@@ -18,6 +18,7 @@ import com.multitab.sessionRequest.application.port.out.dto.in.ReRegisterSession
 import com.multitab.sessionRequest.application.port.out.dto.out.AfterSessionUserOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.RegisterSessionOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.out.ReRegisterSessionUserMessage;
+import com.multitab.sessionRequest.common.entity.BaseResponse;
 import com.multitab.sessionRequest.domain.Status;
 import com.multitab.sessionRequest.domain.model.SessionRequestDomain;
 import lombok.RequiredArgsConstructor;
@@ -61,13 +62,20 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
             // dto 생성
             MentoringSessionResponseDto mentoringSessionResponseDto =
             mentoringSessionMongoAdapter.getMentorUuidBySessionUuid(dto.getSessionUuid());
+            log.info("before FeignClient");
+            log.info("mentoringSessionResponseDto: {}", mentoringSessionResponseDto);
             // 결제 요청
-            paymentServiceFeignClient.paymentSession(SessionPaymentVo.builder()
+
+            SessionPaymentVo vo = SessionPaymentVo.builder()
                 .sessionUuid(dto.getSessionUuid())
                 .menteeUuid(dto.getMenteeUuid())
                 .mentorUuid(mentoringSessionResponseDto.getMentorUuid())
-                .volt(Integer.parseInt(mentoringSessionResponseDto.getPrice()))
-                .build());
+                .volt(Integer.parseInt(mentoringSessionResponseDto.getPrice())).build();
+            log.info("vo " + vo.toString());
+            BaseResponse<Void> response =
+            paymentServiceFeignClient.paymentSession(vo);
+            log.info("response: {}", response);
+            log.info("after FeignClient");
 
             SessionRequestDomain domain =
                     SessionRequestDomain.createSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid());

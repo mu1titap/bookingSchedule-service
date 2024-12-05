@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatusCode;
 import static com.multitab.sessionRequest.common.entity.BaseResponseStatus.SUCCESS;
 
 
-public record BaseResponse<T>(HttpStatusCode httpStatus, Boolean isSuccess, String message, int code, T result) {
+public record BaseResponse<T>(HttpStatus httpStatus, Boolean isSuccess, String message, int code, T result) {
 
     /**
      * 필요값 : Http상태코드, 성공여부, 메시지, 에러코드, 결과값
