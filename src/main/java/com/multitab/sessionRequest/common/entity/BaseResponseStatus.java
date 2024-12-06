@@ -102,14 +102,15 @@ public enum BaseResponseStatus {
     IS_NOT_HISTORY(HttpStatus.BAD_REQUEST, false, 7001, "세션 참가 이력 없음"),
 
     DEAD_LINE_PASSED(HttpStatus.BAD_REQUEST, false, 7002, "예약 마감일 경과"),
-
     INVALID_SESSION_USER_STATUS(HttpStatus.BAD_REQUEST, false, 7003, "세션 참가 등록을 취소할 수 있는 상태가 아님"),
-    ALREADY_CANCEL(HttpStatus.BAD_REQUEST, false, 7003, "이미 취소된 세션 신청"),
-
+    ALREADY_CANCEL(HttpStatus.BAD_REQUEST, false, 7004, "이미 취소된 세션 신청"),
+    ALREADY_CLOSE_SESSION(HttpStatus.BAD_REQUEST, false, 7005, "닫힌 세션"),
+    FULL_SESSION_USER(HttpStatus.BAD_REQUEST, false, 7006, "최대 인원수 초과"),
+    DUPLICATE_SESSION_REQUEST(HttpStatus.BAD_REQUEST, false, 7007, "중복신청"),
     /**
      * feign client error
      */
-    DISALLOWED_ACTION(HttpStatus.NOT_FOUND, false, 7001, "MSA 간 통신 에러");
+    DISALLOWED_ACTION(HttpStatus.NOT_FOUND, false, 8000, "MSA 간 통신 에러");
 
 
     private final HttpStatusCode httpStatusCode;
