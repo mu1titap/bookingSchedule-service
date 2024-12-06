@@ -82,6 +82,7 @@ public class SessionRequestDomain {
             String registerUuid,
             Integer maxHeadCount )
     {
+        if(sessionUserOutDtos != null) return;
         if( sessionUserOutDtos.size() >= maxHeadCount){
             throw new IllegalArgumentException("최대 신청인원수 초과");
         }
