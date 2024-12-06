@@ -78,7 +78,8 @@ public class SessionRequestDomain {
     }
     public static void isValidSessionState(Boolean isClosed) {
         if (isClosed) {
-            throw new IllegalArgumentException("닫힌 세션");
+            //throw new IllegalArgumentException("닫힌 세션");
+            throw new BaseException(BaseResponseStatus.ALREADY_CLOSE_SESSION);
         }
     }
 
@@ -88,13 +89,14 @@ public class SessionRequestDomain {
             String registerUuid,
             Integer maxHeadCount )
     {
-        if(sessionUserOutDtos != null) return;
-        if( sessionUserOutDtos.size() >= maxHeadCount){
-            throw new IllegalArgumentException("최대 신청인원수 초과");
+        if( sessionUserOutDtos != null && sessionUserOutDtos.size() >= maxHeadCount){
+            //throw new IllegalArgumentException("최대 신청인원수 초과");
+            throw new BaseException(BaseResponseStatus.FULL_SESSION_USER);
         }
         for (SessionUserResponseOutDto sessionUserOutDto : sessionUserOutDtos) {
             if (sessionUserOutDto.getMenteeUuid().equals(registerUuid)) {
-                throw new IllegalArgumentException("중복 신청");
+                //throw new IllegalArgumentException("중복 신청");
+                throw new BaseException(BaseResponseStatus.DUPLICATE_SESSION_REQUEST);
             }
         }
     }
