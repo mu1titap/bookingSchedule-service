@@ -13,6 +13,8 @@ import com.multitab.sessionRequest.application.port.out.dto.in.ReRegisterSession
 import com.multitab.sessionRequest.application.port.out.dto.out.AfterSessionUserOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.RegisterSessionOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.out.ReRegisterSessionUserMessage;
+import com.multitab.sessionRequest.common.entity.BaseResponseStatus;
+import com.multitab.sessionRequest.common.exception.BaseException;
 import com.multitab.sessionRequest.domain.Status;
 import com.multitab.sessionRequest.domain.model.SessionRequestDomain;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         // 세션 상태 확인
         SessionResponseOutDto sessionResponseOut = mentoringServiceCallUseCase.getSessionOutDtoByUuid(uuid);
         log.info("sessionResponseOut : {}", sessionResponseOut);
+        if( sessionResponseOut != null ) throw new BaseException(BaseResponseStatus.NO_MENTORING_SESSION_INFORMATION);
         // 세션 상태 검사 , 예약 마감일 검사
         SessionRequestDomain.isValidSessionState(sessionResponseOut.getIsClosed());
         SessionRequestDomain.isDeadlineValid(sessionResponseOut.getDeadlineDate());

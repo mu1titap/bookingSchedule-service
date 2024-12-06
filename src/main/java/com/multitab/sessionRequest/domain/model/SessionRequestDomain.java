@@ -69,6 +69,7 @@ public class SessionRequestDomain {
                     .status(Status.CANCELLED_BY_USER) // 유저 취소 상태 변경
                     .build();
     }
+
     // 예약마감일 검사
     public static void isDeadlineValid(LocalDate deadlineDate) {
         if (LocalDate.now().isAfter(deadlineDate)) {
