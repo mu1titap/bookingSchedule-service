@@ -45,11 +45,13 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         // 대기상태의 참가자 리스트 조회
         List<SessionUserResponseOutDto> sessionUserListOut =
                 sessionUserInquiryUseCase.getSessionUserOutDtoBySessionUuid(uuid, Status.PENDING);
+        log.info("신청 포인트0");
         // 최대 신청인원수 + 멘티중복신청 검사
         SessionRequestDomain.validateMenteeAndMaxHeadCount(sessionUserListOut, dto.getMenteeUuid(), sessionResponseOut.getMaxHeadCount());
         // 세션 참가신청 상태 확인 (이미 참가상태면 에러,취소 상태면 다시 대기상태로 업데이트)
         SessionUserResponseOutDto sessionUserResponse =
                 sessionUserInquiryUseCase.getSessionUserOutDtoBySessionUuidAndMenteeUuid(uuid, dto.getMenteeUuid());
+        log.info("신청 포인트1");
         // 최초 세션 참가 신청 (insert)
         if( sessionUserResponse == null ) {
             SessionRequestDomain domain =
@@ -66,6 +68,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
             afterSessionUserOutDto.setIsClosed(closedSession);
             afterSessionUserOutDto.setMenteeImageUrl(dto.getUserImageUrl());
             sendMessageOutPort.sendRegisterSessionUserMessage("register-session-user", afterSessionUserOutDto);
+            log.info("신청 포인트 인서트");
         }
         // 취소 -> 대기상태로 업데이트 (취소했다가 다시 신청한 경우임)
         else if( sessionUserResponse.getStatus() == Status.CANCELLED_BY_USER ) {
@@ -84,6 +87,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
                 sendMessageOutPort.sendReRegisterSessionUserMessage("re-register-session-user",
                         getReRegisterSessionUserMessage(dto, sessionResponseOut, shouldCloseSession));
             }
+            log.info("신청 포인트 업데이트");
         }
     }
 
