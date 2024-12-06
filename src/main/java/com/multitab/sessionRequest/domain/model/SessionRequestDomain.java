@@ -1,6 +1,8 @@
 package com.multitab.sessionRequest.domain.model;
 
 import com.multitab.sessionRequest.application.port.out.dto.out.SessionUserResponseOutDto;
+import com.multitab.sessionRequest.common.entity.BaseResponseStatus;
+import com.multitab.sessionRequest.common.exception.BaseException;
 import com.multitab.sessionRequest.domain.Status;
 import lombok.*;
 
@@ -48,14 +50,17 @@ public class SessionRequestDomain {
     // 세션요청도메인 사용자 취소 상태 변경 메서드
     public static SessionRequestDomain createCancelSessionUser(SessionUserResponseOutDto sessionUserOut) {
         if(sessionUserOut == null){
-            throw new IllegalArgumentException("세션 참가 이력 없음");
+            //throw new IllegalArgumentException("세션 참가 이력 없음");
+            throw new BaseException(BaseResponseStatus.IS_NOT_HISTORY);
         }
         String findSessionUserId = sessionUserOut.getId();
         if( sessionUserOut.getStatus() == Status.CANCELLED_BY_USER){
-            throw new IllegalArgumentException("이미 취소된 세션");
+            //throw new IllegalArgumentException("이미 취소된 세션");
+            throw new BaseException(BaseResponseStatus.ALREADY_CANCEL); // 이미 취소된 세션
         }
         if( sessionUserOut.getStatus() != Status.PENDING){
-            throw new IllegalArgumentException("세션 참가 등록을 취소할 수 있는 상태가 아님");
+            //throw new IllegalArgumentException("세션 참가 등록을 취소할 수 있는 상태가 아님");
+            throw new BaseException(BaseResponseStatus.INVALID_SESSION_USER_STATUS);
         }
         return SessionRequestDomain.builder()
                     .id(findSessionUserId)
@@ -67,7 +72,8 @@ public class SessionRequestDomain {
     // 예약마감일 검사
     public static void isDeadlineValid(LocalDate deadlineDate) {
         if (LocalDate.now().isAfter(deadlineDate)) {
-            throw new IllegalArgumentException("예약마감일 경과 " + deadlineDate);
+            //throw new IllegalArgumentException("예약마감일 경과 " + deadlineDate);
+            throw new BaseException(BaseResponseStatus.DEAD_LINE_PASSED);
         }
     }
     public static void isValidSessionState(Boolean isClosed) {
