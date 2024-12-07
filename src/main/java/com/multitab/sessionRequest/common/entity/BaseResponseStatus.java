@@ -107,6 +107,7 @@ public enum BaseResponseStatus {
     ALREADY_CLOSE_SESSION(HttpStatus.BAD_REQUEST, false, 7005, "닫힌 세션"),
     FULL_SESSION_USER(HttpStatus.BAD_REQUEST, false, 7006, "최대 인원수 초과"),
     DUPLICATE_SESSION_REQUEST(HttpStatus.BAD_REQUEST, false, 7007, "중복신청"),
+    NO_MENTORING_SESSION_INFORMATION(HttpStatus.BAD_REQUEST, false, 7008, "세션 정보 없음"),
     /**
      * feign client error
      */
