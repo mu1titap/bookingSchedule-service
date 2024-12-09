@@ -14,6 +14,7 @@ public class RegisterSessionDto {
 
     private String menteeUuid;
     private String userImageUrl;
+    private String nickName;
 
     private String mentoringName;
 

@@ -61,13 +61,13 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
                     sessionUserRepositoryOutPort.registerSessionUser(RegisterSessionOutDto.from(domain));
             // 세션 참가 후 최대정원 다 찼는지 확인
             Boolean closedSession = domain.isClosedSession(sessionUserListOut.size(), sessionResponseOut.getMaxHeadCount());
-
             // 정원 다 찼으면 세션 command table update
             if(closedSession) mentoringServiceCallUseCase.closeSession(uuid);
             // "세션 참가등록" 메시지 발행
             afterSessionUserOutDto.setMentoringName(dto.getMentoringName());
             afterSessionUserOutDto.setIsClosed(closedSession);
             afterSessionUserOutDto.setMenteeImageUrl(dto.getUserImageUrl());
+            afterSessionUserOutDto.setNickName(dto.getNickName());
             sendMessageOutPort.sendRegisterSessionUserMessage("register-session-user", afterSessionUserOutDto);
             log.info("신청 인서트");
         }
