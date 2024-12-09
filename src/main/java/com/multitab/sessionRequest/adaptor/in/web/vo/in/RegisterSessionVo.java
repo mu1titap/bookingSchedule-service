@@ -11,9 +11,11 @@ public class RegisterSessionVo {
     @Schema(description = "세션 uuid", nullable = false)
     private String sessionUuid;
 
+    @Schema(description = "유저 닉네임", nullable = false)
+    private String nickName;
     @Schema(description = "유저 프로필 url", nullable = false)
     private String userImageUrl;
 
-    @Schema(description = "멘토링 이름", nullable = true)
+    @Schema(description = "멘토링 이름", nullable = false)
     private String mentoringName;
 }
