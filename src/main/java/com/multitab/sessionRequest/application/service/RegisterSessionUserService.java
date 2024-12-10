@@ -36,7 +36,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
 
     //@Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
-    public void registerSessionUser(RegisterSessionDto dto) {
+    public void registerSessionUser(RegisterSessionDto dto) { // 멘토 uuid
         String uuid = dto.getSessionUuid();
         // 세션 상태 확인
         SessionResponseOutDto sessionResponseOut = mentoringServiceCallUseCase.getSessionOutDtoByUuid(uuid);
@@ -64,10 +64,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
             // 정원 다 찼으면 세션 command table update
             if(closedSession) mentoringServiceCallUseCase.closeSession(uuid);
             // "세션 참가등록" 메시지 발행
-            afterSessionUserOutDto.setMentoringName(dto.getMentoringName());
-            afterSessionUserOutDto.setIsClosed(closedSession);
-            afterSessionUserOutDto.setMenteeImageUrl(dto.getUserImageUrl());
-            afterSessionUserOutDto.setNickName(dto.getNickName());
+            setResiterSessionUserReadData(dto, afterSessionUserOutDto, closedSession);
             sendMessageOutPort.sendRegisterSessionUserMessage("register-session-user", afterSessionUserOutDto);
             log.info("신청 인서트");
         }
@@ -90,6 +87,14 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
             }
             log.info("신청 업데이트");
         }
+    }
+
+    private static void setResiterSessionUserReadData(RegisterSessionDto dto, AfterSessionUserOutDto afterSessionUserOutDto, Boolean closedSession) {
+        afterSessionUserOutDto.setMentoringName(dto.getMentoringName());
+        afterSessionUserOutDto.setIsClosed(closedSession);
+        afterSessionUserOutDto.setMenteeImageUrl(dto.getUserImageUrl());
+        afterSessionUserOutDto.setNickName(dto.getNickName());
+        afterSessionUserOutDto.setMentorUuid(dto.getMentorUuid());
     }
 
     private  ReRegisterSessionUserMessage getReRegisterSessionUserMessage(RegisterSessionDto dto, SessionResponseOutDto sessionResponseOut, boolean shouldCloseSession) {
