@@ -59,9 +59,9 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
                 sessionUserInquiryUseCase.getSessionUserOutDtoBySessionUuidAndMenteeUuid(uuid, dto.getMenteeUuid());
         // 최초 세션 참가 신청 (insert)
         if( sessionUserResponse == null ) {
-            // dto 생성
+            // 결제 요청
             MentoringSessionResponseDto mentoringSessionResponseDto =
-            mentoringSessionMongoAdapter.getMentorUuidBySessionUuid(dto.getSessionUuid());
+            mentoringSessionMongoAdapter.getMentorUuidBySessionUuid(dto.getSessionUuid()); // For mentorUuid
             log.info("before FeignClient");
             log.info("mentoringSessionResponseDto: {}", mentoringSessionResponseDto);
             // 결제 요청
@@ -69,7 +69,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
             SessionPaymentVo vo = SessionPaymentVo.builder()
                 .sessionUuid(dto.getSessionUuid())
                 .menteeUuid(dto.getMenteeUuid())
-                .mentorUuid(mentoringSessionResponseDto.getMentorUuid())
+                .mentorUuid(null)   // 결합 끊기 위해 세션 완료 될 때 update
                 .volt(Integer.parseInt(mentoringSessionResponseDto.getPrice())).build();
             log.info("vo " + vo.toString());
             BaseResponse<Void> response =
