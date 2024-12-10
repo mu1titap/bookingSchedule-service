@@ -22,27 +22,32 @@ public class SessionRequestDomain {
     private String menteeUuid;
     private Status status;
 
+    private String mentoringName;
+
 
     /**
      * 세션 참가 신청 도메인 생성 메서드
      */
     // 최초 세션 참가 신청
-    public static SessionRequestDomain createSessionRequestDomain(String sessionUuid, String menteeUuid) {
+    public static SessionRequestDomain createSessionRequestDomain(String sessionUuid, String menteeUuid, String mentoringName) {
         return SessionRequestDomain.builder()
                 .sessionUuid(sessionUuid)
                 .menteeUuid(menteeUuid)
                 .status(Status.PENDING) // 대기 상태로 생성
+                .mentoringName(mentoringName)
                 .build();
     }
     // 취소 후 다시 세션 참가 신청
     public static SessionRequestDomain reCreateSessionRequestDomain(String sessionUuid,
                                                                     String menteeUuid,
-                                                                    String sessionUserId) {
+                                                                    String sessionUserId,
+                                                                    String mentoringName) {
         return SessionRequestDomain.builder()
                 .id(sessionUserId)
                 .sessionUuid(sessionUuid)
                 .menteeUuid(menteeUuid)
                 .status(Status.PENDING) // 대기 상태로 생성
+                .mentoringName(mentoringName)
                 .build();
     }
 
