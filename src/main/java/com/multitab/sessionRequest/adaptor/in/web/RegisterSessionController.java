@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/session-request-service")
 public class RegisterSessionController {
     private final SessionRockUseCase sessionRockUseCase;
-
+//
     @Operation(summary = "세션 참가 등록" , description = "- 멘토링 세션 참가 요청 <br>" +
             " 1. 닫힌 세션(isClosed)은 세션 참가 등록 불가 <br>" +
             " 2. 세션에 설정된 예약 마감일 까지의 세션만 참가 등록 가능 <br>" +
