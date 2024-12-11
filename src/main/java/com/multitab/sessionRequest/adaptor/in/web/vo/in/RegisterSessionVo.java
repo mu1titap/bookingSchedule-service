@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 public class RegisterSessionVo {
-    //
+
     @Schema(description = "세션 uuid", nullable = false)
     private String sessionUuid;
     @Schema(description = "멘토 uuid", nullable = false)
