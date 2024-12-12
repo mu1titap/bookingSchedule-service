@@ -19,12 +19,15 @@ public class RegisterSessionOutDto {
 
     private Status status;
 
+    private String mentoringName;
+
     // 도메인 -> 아웃포트 dto
     public static RegisterSessionOutDto from(SessionRequestDomain domain){
         return RegisterSessionOutDto.builder()
                 .sessionUuid(domain.getSessionUuid())
                 .menteeUuid(domain.getMenteeUuid())
                 .status(domain.getStatus())
+                .mentoringName(domain.getMentoringName())
                 .build();
     }
     // 아웃포트 dto -> jpa 엔티티

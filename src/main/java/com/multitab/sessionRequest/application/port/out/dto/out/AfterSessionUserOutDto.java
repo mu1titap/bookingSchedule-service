@@ -14,7 +14,12 @@ import java.time.LocalDateTime;
 public class AfterSessionUserOutDto {
     private String id; // 세션유저 Id
     private String sessionUuid;
+    @Setter
+    private String mentorUuid;
+
     private String menteeUuid;
+    @Setter
+    private String nickName;
     @Setter
     private String menteeImageUrl;
     private Status status;

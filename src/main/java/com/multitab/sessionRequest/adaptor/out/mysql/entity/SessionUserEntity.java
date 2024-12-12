@@ -25,6 +25,7 @@ public class SessionUserEntity extends BaseEntity {
     @Comment("멘티 Uuid")
     private String menteeUuid;
 
+    @Comment("상태")
     @Enumerated(EnumType.STRING)
     private Status status; // 세션 참가 상태
 }

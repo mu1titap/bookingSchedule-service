@@ -18,7 +18,8 @@ import com.multitab.sessionRequest.application.port.out.dto.in.ReRegisterSession
 import com.multitab.sessionRequest.application.port.out.dto.out.AfterSessionUserOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.RegisterSessionOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.out.ReRegisterSessionUserMessage;
-import com.multitab.sessionRequest.common.entity.BaseResponse;
+import com.multitab.sessionRequest.common.entity.BaseResponseStatus;
+import com.multitab.sessionRequest.common.exception.BaseException;
 import com.multitab.sessionRequest.domain.Status;
 import com.multitab.sessionRequest.domain.model.SessionRequestDomain;
 import lombok.RequiredArgsConstructor;
@@ -42,10 +43,12 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
 
     //@Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
-    public void registerSessionUser(RegisterSessionDto dto) {
+    public void registerSessionUser(RegisterSessionDto dto) { // 멘토 uuid
         String uuid = dto.getSessionUuid();
         // 세션 상태 확인
         SessionResponseOutDto sessionResponseOut = mentoringServiceCallUseCase.getSessionOutDtoByUuid(uuid);
+        log.info("sessionResponseOut : {}", sessionResponseOut);
+        if( sessionResponseOut == null ) throw new BaseException(BaseResponseStatus.NO_MENTORING_SESSION_INFORMATION);
         // 세션 상태 검사 , 예약 마감일 검사
         SessionRequestDomain.isValidSessionState(sessionResponseOut.getIsClosed());
         SessionRequestDomain.isDeadlineValid(sessionResponseOut.getDeadlineDate());
@@ -77,19 +80,17 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
             log.info("after FeignClient");
 
             SessionRequestDomain domain =
-                    SessionRequestDomain.createSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid());
+                    SessionRequestDomain.createSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid(), dto.getMentoringName());
             AfterSessionUserOutDto afterSessionUserOutDto =
                     sessionUserRepositoryOutPort.registerSessionUser(RegisterSessionOutDto.from(domain));
             // 세션 참가 후 최대정원 다 찼는지 확인
             Boolean closedSession = domain.isClosedSession(sessionUserListOut.size(), sessionResponseOut.getMaxHeadCount());
-
             // 정원 다 찼으면 세션 command table update
             if(closedSession) mentoringServiceCallUseCase.closeSession(uuid);
             // "세션 참가등록" 메시지 발행
-            afterSessionUserOutDto.setMentoringName(dto.getMentoringName());
-            afterSessionUserOutDto.setIsClosed(closedSession);
-            afterSessionUserOutDto.setMenteeImageUrl(dto.getUserImageUrl());
+            setResiterSessionUserReadData(dto, afterSessionUserOutDto, closedSession);
             sendMessageOutPort.sendRegisterSessionUserMessage("register-session-user", afterSessionUserOutDto);
+            log.info("신청 인서트");
         }
         // 취소 -> 대기상태로 업데이트 (취소했다가 다시 신청한 경우임)
         else if( sessionUserResponse.getStatus() == Status.CANCELLED_BY_USER ) {
@@ -104,7 +105,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
 
             // 재등록
             SessionRequestDomain domain =
-                    SessionRequestDomain.reCreateSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid(), sessionUserResponse.getId());
+                    SessionRequestDomain.reCreateSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid(), sessionUserResponse.getId(), dto.getMentoringName());
             Integer count = sessionUserRepositoryOutPort.reRegisterSessionUser(ReRegisterSessionOutDto.from(domain));
             if( count > 0 ){
                 Boolean closedSession = domain.isClosedSession(sessionUserListOut.size(), sessionResponseOut.getMaxHeadCount());
@@ -117,13 +118,23 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
                 sendMessageOutPort.sendReRegisterSessionUserMessage("re-register-session-user",
                         getReRegisterSessionUserMessage(dto, sessionResponseOut, shouldCloseSession));
             }
+            log.info("신청 업데이트");
         }
+    }
+
+    private static void setResiterSessionUserReadData(RegisterSessionDto dto, AfterSessionUserOutDto afterSessionUserOutDto, Boolean closedSession) {
+        afterSessionUserOutDto.setMentoringName(dto.getMentoringName());
+        afterSessionUserOutDto.setIsClosed(closedSession);
+        afterSessionUserOutDto.setMenteeImageUrl(dto.getUserImageUrl());
+        afterSessionUserOutDto.setNickName(dto.getNickName());
+        afterSessionUserOutDto.setMentorUuid(dto.getMentorUuid());
     }
 
     private  ReRegisterSessionUserMessage getReRegisterSessionUserMessage(RegisterSessionDto dto, SessionResponseOutDto sessionResponseOut, boolean shouldCloseSession) {
         return ReRegisterSessionUserMessage.builder()
                 .sessionUuid(dto.getSessionUuid())
                 .menteeUuid(dto.getMenteeUuid())
+                .menteeImageUrl(dto.getUserImageUrl())
                 .startDate(sessionResponseOut.getStartDate())
                 .shouldCloseSession(shouldCloseSession)
                 .build();

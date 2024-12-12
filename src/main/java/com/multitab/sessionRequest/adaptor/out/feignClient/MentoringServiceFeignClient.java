@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 
-@FeignClient(name="mentoring-service")
+@FeignClient(name="mentoring-service", url = "${mentoring-service.base-url}")
 public interface MentoringServiceFeignClient {
 
     // mentoring-service 의 세션 조회 api 호출
@@ -18,4 +18,6 @@ public interface MentoringServiceFeignClient {
 
     @PutMapping("/api/v1/mentoring-service/session-open/{uuid}")
     void openSession(@PathVariable(name = "uuid") String uuid);
-}       
+}
+
+

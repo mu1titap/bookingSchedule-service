@@ -90,10 +90,35 @@ public enum BaseResponseStatus {
      * 6000: gpt-api error
      */
     // Media
-    NO_EXIST_MEDIA(HttpStatus.NOT_FOUND, false, 6001, "존재하지 않는 미디어입니다");
+    NO_EXIST_MEDIA(HttpStatus.NOT_FOUND, false, 6001, "존재하지 않는 미디어입니다"),
+
+
+
+
+
+    /**
+     * 7000 : 세션 참가
+     */
+    IS_NOT_HISTORY(HttpStatus.BAD_REQUEST, false, 7001, "세션 참가 이력 없음"),
+
+    DEAD_LINE_PASSED(HttpStatus.BAD_REQUEST, false, 7002, "예약 마감일 경과"),
+    INVALID_SESSION_USER_STATUS(HttpStatus.BAD_REQUEST, false, 7003, "세션 참가 등록을 취소할 수 있는 상태가 아님"),
+    ALREADY_CANCEL(HttpStatus.BAD_REQUEST, false, 7004, "이미 취소된 세션 신청"),
+    ALREADY_CLOSE_SESSION(HttpStatus.BAD_REQUEST, false, 7005, "닫힌 세션"),
+    FULL_SESSION_USER(HttpStatus.BAD_REQUEST, false, 7006, "최대 인원수 초과"),
+    DUPLICATE_SESSION_REQUEST(HttpStatus.BAD_REQUEST, false, 7007, "중복신청"),
+    NO_MENTORING_SESSION_INFORMATION(HttpStatus.BAD_REQUEST, false, 7008, "세션 정보 없음"),
+    /**
+     * feign client error
+     */
+    MENTORING_SERVICE_FEIGN_ERROR(HttpStatus.NOT_FOUND, false, 8000, "멘토링 서비스 페인 클라이언트 에러");
+
 
     private final HttpStatus httpStatusCode;
     private final boolean isSuccess;
     private final int code;
     private final String message;
+
+
+
 }
