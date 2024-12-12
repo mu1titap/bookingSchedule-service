@@ -114,7 +114,7 @@ public enum BaseResponseStatus {
     MENTORING_SERVICE_FEIGN_ERROR(HttpStatus.NOT_FOUND, false, 8000, "멘토링 서비스 페인 클라이언트 에러");
 
 
-    private final HttpStatusCode httpStatusCode;
+    private final HttpStatus httpStatusCode;
     private final boolean isSuccess;
     private final int code;
     private final String message;
