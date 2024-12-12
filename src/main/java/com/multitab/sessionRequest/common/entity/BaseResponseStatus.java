@@ -111,7 +111,7 @@ public enum BaseResponseStatus {
     /**
      * feign client error
      */
-    DISALLOWED_ACTION(HttpStatus.NOT_FOUND, false, 8000, "MSA 간 통신 에러");
+    MENTORING_SERVICE_FEIGN_ERROR(HttpStatus.NOT_FOUND, false, 8000, "멘토링 서비스 페인 클라이언트 에러");
 
 
     private final HttpStatusCode httpStatusCode;

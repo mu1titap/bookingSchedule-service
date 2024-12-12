@@ -18,7 +18,7 @@ public class BaseExceptionHandler {
      */
     @ExceptionHandler(FeignException.class)
     protected ResponseEntity<BaseResponse<Void>> handleFeignException(FeignException e) {
-        BaseResponse<Void> response = new BaseResponse<>(BaseResponseStatus.DISALLOWED_ACTION);
+        BaseResponse<Void> response = new BaseResponse<>(BaseResponseStatus.MENTORING_SERVICE_FEIGN_ERROR);
         log.error("FeignException: {}", e.getMessage());
         log.info("Response: {}", response.message());
         return new ResponseEntity<>(response, response.httpStatus());
