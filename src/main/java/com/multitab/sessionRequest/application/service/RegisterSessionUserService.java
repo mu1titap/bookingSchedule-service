@@ -57,21 +57,20 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         // 세션 참가신청 상태 확인 (이미 참가상태면 에러,취소 상태면 다시 대기상태로 업데이트)
         SessionUserResponseOutDto sessionUserResponse =
                 sessionUserInquiryUseCase.getSessionUserOutDtoBySessionUuidAndMenteeUuid(uuid, dto.getMenteeUuid());
+        // 결제 요청 data 생성
+        MentoringSessionResponseDto mentoringSessionResponseDto =
+            mentoringSessionMongoAdapter.getMentorUuidBySessionUuid(dto.getSessionUuid()); // For mentorUuid
+
+        SessionPaymentVo vo = SessionPaymentVo.builder()
+            .sessionUuid(dto.getSessionUuid())
+            .menteeUuid(dto.getMenteeUuid())
+            .mentorUuid(null)   // 결합 끊기 위해 세션 완료 될 때 update
+            .volt(Integer.parseInt(mentoringSessionResponseDto.getPrice())).build();
         // 최초 세션 참가 신청 (insert)
         if( sessionUserResponse == null ) {
             // 결제 요청
-            MentoringSessionResponseDto mentoringSessionResponseDto =
-            mentoringSessionMongoAdapter.getMentorUuidBySessionUuid(dto.getSessionUuid()); // For mentorUuid
             log.info("before FeignClient");
             log.info("mentoringSessionResponseDto: {}", mentoringSessionResponseDto);
-            // 결제 요청
-
-            SessionPaymentVo vo = SessionPaymentVo.builder()
-                .sessionUuid(dto.getSessionUuid())
-                .menteeUuid(dto.getMenteeUuid())
-                .mentorUuid(null)   // 결합 끊기 위해 세션 완료 될 때 update
-                .volt(Integer.parseInt(mentoringSessionResponseDto.getPrice())).build();
-            log.info("vo " + vo.toString());
             BaseResponse<Void> response =
             paymentServiceFeignClient.paymentSession(vo);
             log.info("response: {}", response);
@@ -94,6 +93,15 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         }
         // 취소 -> 대기상태로 업데이트 (취소했다가 다시 신청한 경우임)
         else if( sessionUserResponse.getStatus() == Status.CANCELLED_BY_USER ) {
+            // 결제 요청
+            log.info("before FeignClient");
+            log.info("mentoringSessionResponseDto: {}", mentoringSessionResponseDto);
+            BaseResponse<Void> response =
+                paymentServiceFeignClient.paymentSession(vo);
+            log.info("response: {}", response);
+            log.info("after FeignClient");
+
+
             // 재등록
             SessionRequestDomain domain =
                     SessionRequestDomain.reCreateSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid(), sessionUserResponse.getId());
