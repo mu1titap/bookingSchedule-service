@@ -10,10 +10,12 @@ import org.springframework.stereotype.Component;
 public class RegisterSessionVoMapper {
     public static RegisterSessionDto of (String userUuid,RegisterSessionVo vo) {
         return RegisterSessionDto.builder()
+                .sessionUuid(vo.getSessionUuid())
+                .mentorUuid(vo.getMentorUuid())
                 .menteeUuid(userUuid)
+                .volt(vo.getVolt())
                 .nickName(vo.getNickName())
                 .userImageUrl(vo.getUserImageUrl())
-                .sessionUuid(vo.getSessionUuid())
                 .mentoringName(vo.getMentoringName())
                 .build();
     }
