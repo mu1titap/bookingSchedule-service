@@ -56,7 +56,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         // 최초 세션 참가 신청 (insert)
         if( sessionUserResponse == null ) {
             SessionRequestDomain domain =
-                    SessionRequestDomain.createSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid());
+                    SessionRequestDomain.createSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid(), dto.getMentoringName());
             AfterSessionUserOutDto afterSessionUserOutDto =
                     sessionUserRepositoryOutPort.registerSessionUser(RegisterSessionOutDto.from(domain));
             // 세션 참가 후 최대정원 다 찼는지 확인
@@ -72,7 +72,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         else if( sessionUserResponse.getStatus() == Status.CANCELLED_BY_USER ) {
             // 재등록
             SessionRequestDomain domain =
-                    SessionRequestDomain.reCreateSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid(), sessionUserResponse.getId());
+                    SessionRequestDomain.reCreateSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid(), sessionUserResponse.getId(), dto.getMentoringName());
             Integer count = sessionUserRepositoryOutPort.reRegisterSessionUser(ReRegisterSessionOutDto.from(domain));
             if( count > 0 ){
                 Boolean closedSession = domain.isClosedSession(sessionUserListOut.size(), sessionResponseOut.getMaxHeadCount());
