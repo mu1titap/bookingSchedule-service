@@ -3,8 +3,6 @@ package com.multitab.sessionRequest.application.service;
 import com.multitab.sessionRequest.adaptor.out.feignClient.PaymentServiceFeignClient;
 import com.multitab.sessionRequest.adaptor.out.feignClient.dto.SessionResponseOutDto;
 import com.multitab.sessionRequest.adaptor.out.feignClient.vo.SessionPaymentVo;
-import com.multitab.sessionRequest.adaptor.out.mongo.dto.MentoringSessionResponseDto;
-import com.multitab.sessionRequest.adaptor.out.mongo.persistence.MentoringSessionMongoAdapter;
 import com.multitab.sessionRequest.application.port.in.MentoringServiceCallUseCase;
 import com.multitab.sessionRequest.application.port.in.RegisterSessionUserUseCase;
 import com.multitab.sessionRequest.application.port.in.SendMessageUseCase;
@@ -18,6 +16,7 @@ import com.multitab.sessionRequest.application.port.out.dto.in.ReRegisterSession
 import com.multitab.sessionRequest.application.port.out.dto.out.AfterSessionUserOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.RegisterSessionOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.out.ReRegisterSessionUserMessage;
+import com.multitab.sessionRequest.common.entity.BaseResponse;
 import com.multitab.sessionRequest.common.entity.BaseResponseStatus;
 import com.multitab.sessionRequest.common.exception.BaseException;
 import com.multitab.sessionRequest.domain.Status;
@@ -39,7 +38,6 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
     private final SessionUserRepositoryOutPort sessionUserRepositoryOutPort;
     private final SendMessageOutPort sendMessageOutPort;
     private final PaymentServiceFeignClient paymentServiceFeignClient;
-    private final MentoringSessionMongoAdapter mentoringSessionMongoAdapter;
 
     //@Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
@@ -61,19 +59,19 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         SessionUserResponseOutDto sessionUserResponse =
                 sessionUserInquiryUseCase.getSessionUserOutDtoBySessionUuidAndMenteeUuid(uuid, dto.getMenteeUuid());
         // 결제 요청 data 생성
-        MentoringSessionResponseDto mentoringSessionResponseDto =
-            mentoringSessionMongoAdapter.getMentorUuidBySessionUuid(dto.getSessionUuid()); // For mentorUuid
-
         SessionPaymentVo vo = SessionPaymentVo.builder()
             .sessionUuid(dto.getSessionUuid())
             .menteeUuid(dto.getMenteeUuid())
             .mentorUuid(null)   // 결합 끊기 위해 세션 완료 될 때 update
-            .volt(Integer.parseInt(mentoringSessionResponseDto.getPrice())).build();
+            .volt(dto.getVolt())
+            .mentoringName(dto.getMentoringName())
+            .nickname(dto.getNickName())
+            .build();
+
         // 최초 세션 참가 신청 (insert)
         if( sessionUserResponse == null ) {
             // 결제 요청
             log.info("before FeignClient");
-            log.info("mentoringSessionResponseDto: {}", mentoringSessionResponseDto);
             BaseResponse<Void> response =
             paymentServiceFeignClient.paymentSession(vo);
             log.info("response: {}", response);
@@ -96,7 +94,6 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         else if( sessionUserResponse.getStatus() == Status.CANCELLED_BY_USER ) {
             // 결제 요청
             log.info("before FeignClient");
-            log.info("mentoringSessionResponseDto: {}", mentoringSessionResponseDto);
             BaseResponse<Void> response =
                 paymentServiceFeignClient.paymentSession(vo);
             log.info("response: {}", response);
