@@ -1,11 +1,14 @@
 package com.multitab.sessionRequest.application.service;
 
+import com.multitab.sessionRequest.adaptor.out.feignClient.PaymentServiceFeignClient;
 import com.multitab.sessionRequest.adaptor.out.feignClient.dto.SessionResponseOutDto;
+import com.multitab.sessionRequest.adaptor.out.feignClient.vo.SessionPaymentVo;
 import com.multitab.sessionRequest.application.port.in.MentoringServiceCallUseCase;
 import com.multitab.sessionRequest.application.port.in.RegisterSessionUserUseCase;
 import com.multitab.sessionRequest.application.port.in.SendMessageUseCase;
 import com.multitab.sessionRequest.application.port.in.SessionUserInquiryUseCase;
 import com.multitab.sessionRequest.application.port.in.dto.RegisterSessionDto;
+import com.multitab.sessionRequest.application.port.out.MentoringServiceCallOutPort;
 import com.multitab.sessionRequest.application.port.out.SendMessageOutPort;
 import com.multitab.sessionRequest.application.port.out.SessionUserRepositoryOutPort;
 import com.multitab.sessionRequest.application.port.out.dto.out.SessionUserResponseOutDto;
@@ -13,6 +16,7 @@ import com.multitab.sessionRequest.application.port.out.dto.in.ReRegisterSession
 import com.multitab.sessionRequest.application.port.out.dto.out.AfterSessionUserOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.in.RegisterSessionOutDto;
 import com.multitab.sessionRequest.application.port.out.dto.out.ReRegisterSessionUserMessage;
+import com.multitab.sessionRequest.common.entity.BaseResponse;
 import com.multitab.sessionRequest.common.entity.BaseResponseStatus;
 import com.multitab.sessionRequest.common.exception.BaseException;
 import com.multitab.sessionRequest.domain.Status;
@@ -33,6 +37,7 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
     private final SessionUserInquiryUseCase sessionUserInquiryUseCase;
     private final SessionUserRepositoryOutPort sessionUserRepositoryOutPort;
     private final SendMessageOutPort sendMessageOutPort;
+    private final PaymentServiceFeignClient paymentServiceFeignClient;
 
     //@Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
@@ -53,8 +58,25 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         // 세션 참가신청 상태 확인 (이미 참가상태면 에러,취소 상태면 다시 대기상태로 업데이트)
         SessionUserResponseOutDto sessionUserResponse =
                 sessionUserInquiryUseCase.getSessionUserOutDtoBySessionUuidAndMenteeUuid(uuid, dto.getMenteeUuid());
+        // 결제 요청 data 생성
+        SessionPaymentVo vo = SessionPaymentVo.builder()
+            .sessionUuid(dto.getSessionUuid())
+            .menteeUuid(dto.getMenteeUuid())
+            .mentorUuid(null)   // 결합 끊기 위해 세션 완료 될 때 update
+            .volt(dto.getVolt())
+            .mentoringName(dto.getMentoringName())
+            .nickname(dto.getNickName())
+            .build();
+
         // 최초 세션 참가 신청 (insert)
         if( sessionUserResponse == null ) {
+            // 결제 요청
+            log.info("before FeignClient");
+            BaseResponse<Void> response =
+            paymentServiceFeignClient.paymentSession(vo);
+            log.info("response: {}", response);
+            log.info("after FeignClient");
+
             SessionRequestDomain domain =
                     SessionRequestDomain.createSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid(), dto.getMentoringName());
             AfterSessionUserOutDto afterSessionUserOutDto =
@@ -70,6 +92,14 @@ public class RegisterSessionUserService implements RegisterSessionUserUseCase {
         }
         // 취소 -> 대기상태로 업데이트 (취소했다가 다시 신청한 경우임)
         else if( sessionUserResponse.getStatus() == Status.CANCELLED_BY_USER ) {
+            // 결제 요청
+            log.info("before FeignClient");
+            BaseResponse<Void> response =
+                paymentServiceFeignClient.paymentSession(vo);
+            log.info("response: {}", response);
+            log.info("after FeignClient");
+
+
             // 재등록
             SessionRequestDomain domain =
                     SessionRequestDomain.reCreateSessionRequestDomain(dto.getSessionUuid(), dto.getMenteeUuid(), sessionUserResponse.getId(), dto.getMentoringName());
