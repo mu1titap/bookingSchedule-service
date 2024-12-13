@@ -21,4 +21,3 @@ public interface MentoringServiceFeignClient {
     void openSession(@PathVariable(name = "uuid") String uuid);
 }
 
-
