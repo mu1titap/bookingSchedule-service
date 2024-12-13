@@ -2,6 +2,8 @@ package com.multitab.sessionRequest.adaptor.in.web;
 
 import com.multitab.sessionRequest.adaptor.in.web.mapper.RegisterSessionVoMapper;
 import com.multitab.sessionRequest.adaptor.in.web.vo.in.RegisterSessionVo;
+import com.multitab.sessionRequest.adaptor.out.feignClient.dto.SessionResponseOutDto;
+import com.multitab.sessionRequest.application.port.in.MentoringServiceCallUseCase;
 import com.multitab.sessionRequest.application.port.in.RegisterSessionUserUseCase;
 import com.multitab.sessionRequest.application.port.in.SessionRockUseCase;
 import com.multitab.sessionRequest.common.entity.BaseResponse;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/session-request-service")
 public class RegisterSessionController {
     private final SessionRockUseCase sessionRockUseCase;
+    private final MentoringServiceCallUseCase mentoringServiceCallUseCase;
 //
     @Operation(summary = "세션 참가 등록" , description = "- 멘토링 세션 참가 요청 <br>" +
             " 1. 닫힌 세션(isClosed)은 세션 참가 등록 불가 <br>" +
@@ -24,7 +27,7 @@ public class RegisterSessionController {
             " 3. 멘티의 중복 신청 불가 <br>" +
             " 4. 세션에 설정된 최대 인원수 까지만 등록 받음 <br>"+
             " 5. 멘티의 다른 세션참여 등록 시간과 겹칠 경우 불가 (예정) <br>"+
-            " 참고 : 인자 중에서 mentoringName 는 직접적으로 멘토링 세션 참가 등록 기능에 필요한 데이터는 아니지만 스케줄 read data 업데이트에 필요함"
+            " 참고 : 인자 중에서 mentoringName 는 직접적으로 멘토링 세션 참가 등록 기능에 필요한 데이터는 아니지만 스케줄 read data 업데이트에 필요함<br>f"
             ,tags = {"멘토링 세션 참가"})
     @PostMapping("")
     public BaseResponse<Void> createMentoringAndSession(@RequestHeader("userUuid") String userUuid,
@@ -33,5 +36,12 @@ public class RegisterSessionController {
         sessionRockUseCase.registerSessionUser(RegisterSessionVoMapper.of(userUuid,request));
         return new BaseResponse<>(BaseResponseStatus.SUCCESS);
     }
+    @Operation(summary = "멘토링 서비스에게로 세션 정보 가져오는 feign client 테스트 Api" ,description = "입력 인자 : uuid(세션 uuid) "
+            ,tags = {"feignClient"})
+    @GetMapping("/feign-client-test")
+    public BaseResponse<SessionResponseOutDto> SessionResponseOutDto(@RequestParam("uuid") String uuid) {
+        return new BaseResponse<>( mentoringServiceCallUseCase.getSessionOutDtoByUuid(uuid));
+    }
+    //SessionResponseOutDto sessionResponseOut = mentoringServiceCallUseCase.getSessionOutDtoByUuid(uuid)
 }
 

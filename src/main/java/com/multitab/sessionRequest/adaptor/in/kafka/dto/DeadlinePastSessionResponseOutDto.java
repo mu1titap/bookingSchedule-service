@@ -11,6 +11,8 @@ import java.time.LocalDate;
 @ToString
 public class DeadlinePastSessionResponseOutDto {
     private Long mentoringId;
+    private String mentorName;
+
     private String mentorUuid;
     private Long sessionId;
     private String sessionUuid;
